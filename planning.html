@@ -71,7 +71,7 @@
                 list.innerHTML = "";
                 if(!data) { list.innerHTML = "<p style='text-align:center;padding:3rem;color:#999'>Aucune réservation pour le moment.</p>"; return; }
 
-                const all = Object.values(data);
+                const all = Object.values(data).filter(r => r.fullname && r.service && r.phone && r.date && r.time);
                 all.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
 
                 const grouped = {};
