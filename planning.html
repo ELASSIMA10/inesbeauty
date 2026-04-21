@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning INES BEAUTY</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --sage: #7B8470; --cream: #F8F5F0; --dark: #2C2C2C; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--cream); color: var(--dark); margin: 0; padding: 20px; }
+        #login { height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .box { background: white; padding: 3rem; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; border-top: 8px solid var(--sage); }
+        input { font-size: 2rem; width: 200px; text-align: center; letter-spacing: 10px; padding: 10px; margin: 20px 0; border: 1px solid #ddd; }
+        .btn { background: var(--sage); color: white; border: none; padding: 15px 30px; font-weight: 700; cursor: pointer; border-radius: 4px; width: 100%; }
+        
+        #content { display: none; max-width: 800px; margin: 0 auto; }
+        h1 { font-family: 'Playfair Display', serif; color: var(--sage); text-align: center; }
+        .res-card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid var(--sage); box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .time { background: var(--sage); color: white; padding: 10px; border-radius: 4px; font-weight: 700; font-size: 1.2rem; min-width: 80px; text-align: center; }
+        .info b { font-size: 1.2rem; display: block; margin-bottom: 5px; }
+        .info span { color: #D32F2F; font-weight: 700; margin-right: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="login">
+        <div class="box">
+            <h1>ADMIN ACCÈS</h1>
+            <p>Entrez le code pour voir les réservations</p>
+            <input type="password" id="pin" maxlength="4" placeholder="••••">
+            <button class="btn" onclick="check()">ENTRER</button>
+        </div>
+    </div>
+
+    <div id="content">
+        <h1>Planning Ines Beauty</h1>
+        <div style="text-align: center; margin-bottom: 2rem;"><button onclick="location.reload()" style="background:none; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer;">Déconnexion</button></div>
+        <div id="list"></div>
+    </div>
+
+    <script>
+        const config = {
+            apiKey: "AIzaSyBgK8ZKmZ0N329vOTfpiAyYAhPu_mhyTAM",
+            authDomain: "app-10-1b5fd.firebaseapp.com",
+            projectId: "app-10-1b5fd",
+            storageBucket: "app-10-1b5fd.appspot.com",
+            messagingSenderId: "179443689337",
+            appId: "1:179443689337:web:31ca73ac50811b286931a8"
+        };
+        firebase.initializeApp(config);
+        const db = firebase.firestore();
+
+        function check() {
+            if(document.getElementById('pin').value === "2020") {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                load();
+            } else {
+                alert("CODE FAUX");
+            }
+        }
+
+        function load() {
+            db.collection("ines_beauty_bookings").orderBy("date", "asc").orderBy("time", "asc").onSnapshot(snap => {
+                const list = document.getElementById('list');
+                list.innerHTML = "";
+                if(snap.empty) list.innerHTML = "<p style='text-align:center;'>Aucune réservation.</p>";
+                snap.forEach(doc => {
+                    const r = doc.data();
+                    list.innerHTML += `
+                        <div class="res-card">
+                            <div class="info">
+                                <b>${r.fullname}</b>
+                                <span>${r.date}</span>
+                                <small>${r.service} - 📞 ${r.phone}</small>
+                            </div>
+                            <div class="time">${r.time}</div>
+                        </div>
+                    `;
+                });
+            });
+        }
+    </script>
+</body>
+</html>
