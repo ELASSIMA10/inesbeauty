@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ines Beauty Institut | Tarifs & Réservations</title>
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -186,28 +185,21 @@
     </div>
 
     <script>
-        const config = {
-            apiKey: "AIzaSyBgK8ZKmZ0N329vOTfpiAyYAhPu_mhyTAM",
-            authDomain: "app-10-1b5fd.firebaseapp.com",
-            databaseURL: "https://el-assima-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "app-10-1b5fd",
-            storageBucket: "app-10-1b5fd.appspot.com",
-            messagingSenderId: "179443689337",
-            appId: "1:179443689337:web:31ca73ac50811b286931a8"
-        };
-        firebase.initializeApp(config);
-        const db = firebase.database();
+        const DB_URL = "https://el-assima-default-rtdb.europe-west1.firebasedatabase.app";
 
         let bookedSlots = [];
 
         async function checkAvailability() {
             const date = document.getElementById('cust-date').value;
             if(!date) return;
-            const snap = await db.ref("ines_beauty_bookings").orderByChild("date").equalTo(date).get();
-            bookedSlots = [];
-            if(snap.exists()) {
-                snap.forEach(child => { bookedSlots.push(child.val().time); });
-            }
+            try {
+                const res = await fetch(`${DB_URL}/ines_beauty_bookings.json`);
+                const data = await res.json();
+                bookedSlots = [];
+                if(data) {
+                    Object.values(data).forEach(r => { if(r.date === date) bookedSlots.push(r.time); });
+                }
+            } catch(e) { bookedSlots = []; }
             renderSlots();
         }
 
@@ -268,10 +260,17 @@
             const btn = document.getElementById('submit-btn');
             btn.disabled = true; btn.innerText = "ENVOI...";
             try {
-                await db.ref("ines_beauty_bookings").push({
-                    fullname: document.getElementById('cust-name').value, service: document.getElementById('cust-type').value,
-                    date: document.getElementById('cust-date').value, time: time, phone: document.getElementById('cust-phone').value,
-                    timestamp: Date.now()
+                await fetch(`${DB_URL}/ines_beauty_bookings.json`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        fullname: document.getElementById('cust-name').value,
+                        service: document.getElementById('cust-type').value,
+                        date: document.getElementById('cust-date').value,
+                        time: time,
+                        phone: document.getElementById('cust-phone').value,
+                        timestamp: Date.now()
+                    })
                 });
                 alert("CONFIRMÉ !"); closeModal(); e.target.reset();
             } catch(e) { alert("ERREUR"); }

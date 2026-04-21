@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planning INES BEAUTY</title>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --sage: #7B8470; --cream: #F8F5F0; --dark: #2C2C2C; }
@@ -42,17 +41,7 @@
     </div>
 
     <script>
-        const config = {
-            apiKey: "AIzaSyBgK8ZKmZ0N329vOTfpiAyYAhPu_mhyTAM",
-            authDomain: "app-10-1b5fd.firebaseapp.com",
-            databaseURL: "https://el-assima-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "app-10-1b5fd",
-            storageBucket: "app-10-1b5fd.appspot.com",
-            messagingSenderId: "179443689337",
-            appId: "1:179443689337:web:31ca73ac50811b286931a8"
-        };
-        firebase.initializeApp(config);
-        const db = firebase.database();
+        const DB_URL = "https://el-assima-default-rtdb.europe-west1.firebasedatabase.app";
 
         function check() {
             if(document.getElementById('pin').value === "2020") {
@@ -73,36 +62,31 @@
             return `${days[date.getDay()]} ${d} ${months[m - 1]} ${y}`;
         }
 
-        function load() {
-            db.ref("ines_beauty_bookings").get().then(snap => {
-                const list = document.getElementById('list');
+        async function load() {
+            const list = document.getElementById('list');
+            list.innerHTML = "<p style='text-align:center;padding:2rem'>Chargement...</p>";
+            try {
+                const res = await fetch(`${DB_URL}/ines_beauty_bookings.json`);
+                const data = await res.json();
                 list.innerHTML = "";
-                if(!snap.exists()) { list.innerHTML = "<p style='text-align:center; padding: 3rem; color: #999;'>Aucune réservation pour le moment.</p>"; return; }
+                if(!data) { list.innerHTML = "<p style='text-align:center;padding:3rem;color:#999'>Aucune réservation pour le moment.</p>"; return; }
 
-                const all = [];
-                snap.forEach(child => all.push(child.val()));
+                const all = Object.values(data);
                 all.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
 
                 const grouped = {};
-                all.forEach(r => {
-                    if(!grouped[r.date]) grouped[r.date] = [];
-                    grouped[r.date].push(r);
-                });
+                all.forEach(r => { if(!grouped[r.date]) grouped[r.date] = []; grouped[r.date].push(r); });
 
                 Object.keys(grouped).sort().forEach(date => {
                     const rsvs = grouped[date];
                     list.innerHTML += `<div class="day-header"><span>📅 ${formatDate(date)}</span><span class="badge">${rsvs.length} RDV</span></div>`;
                     rsvs.forEach(r => {
-                        list.innerHTML += `
-                            <div class="res-card">
-                                <div class="info"><b>${r.fullname}</b><small>${r.service} — 📞 ${r.phone}</small></div>
-                                <div class="time">${r.time}</div>
-                            </div>`;
+                        list.innerHTML += `<div class="res-card"><div class="info"><b>${r.fullname}</b><small>${r.service} — 📞 ${r.phone}</small></div><div class="time">${r.time}</div></div>`;
                     });
                 });
-            }).catch(err => {
-                document.getElementById('list').innerHTML = "<p style='color:red;text-align:center'>Erreur Firebase: " + err.message + "</p>";
-            });
+            } catch(err) {
+                list.innerHTML = "<p style='color:red;text-align:center'>Erreur: " + err.message + "</p>";
+            }
         }
     </script>
 </body>
