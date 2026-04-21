@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institut Ines Beauty | L'Excellence au Féminin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #F4C2C2; /* Rose poudré */
+            --secondary: #D4AF37; /* Or */
+            --dark: #2C2C2C;
+            --light: #FFF9F9;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--light); color: var(--dark); overflow-x: hidden; }
+
+        header {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('assets/images/hero.png') center/cover no-repeat;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            color: white; position: relative;
+        }
+
+        .hero-content {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            padding: 3rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; margin-bottom: 1rem; color: var(--primary); letter-spacing: 2px; }
+        p.subtitle { font-size: 1.2rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 2rem; opacity: 0.9; }
+
+        .btn-gold {
+            padding: 1.2rem 2.5rem; font-weight: 700; text-transform: uppercase;
+            background: var(--secondary); color: white; border: none; border-radius: 50px;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+        }
+        .btn-gold:hover { transform: scale(1.05); background: #B8860B; }
+
+        .services { padding: 5rem 1rem; text-align: center; }
+        .services h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 3rem; position: relative; display: inline-block; }
+        .services h2::after { content: ''; position: absolute; bottom: -10px; left: 50%; width: 50px; height: 2px; background: var(--secondary); transform: translateX(-50%); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+        
+        .card { 
+            background: white; padding: 2.5rem; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            transition: 0.3s; border-bottom: 4px solid transparent; text-align: left;
+        }
+        .card:hover { transform: translateY(-10px); border-bottom: 4px solid var(--primary); }
+        .card h3 { font-family: 'Playfair Display', serif; margin-bottom: 1rem; color: var(--secondary); font-size: 1.5rem; }
+        .card p { color: #666; line-height: 1.6; font-size: 0.95rem; }
+
+        .footer { background: var(--dark); color: white; padding: 4rem 1rem; text-align: center; }
+        .contact-info { margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.8; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .hero-content { padding: 2rem 1rem; width: 90%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="hero-content">
+            <p class="subtitle">Bienvenue chez</p>
+            <h1>INSTITUT INES BEAUTY</h1>
+            <p style="margin-bottom:2rem; font-style: italic;">"L'art de sublimer votre beauté naturelle"</p>
+            <button class="btn-gold">PRENDRE RENDEZ-VOUS</button>
+        </div>
+    </header>
+
+    <section class="services">
+        <h2>Nos Services Signature</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Soins du Visage</h3>
+                <p>Des soins personnalisés pour redonner éclat et jeunesse à votre peau à l'aide de technologies de pointe.</p>
+            </div>
+            <div class="card">
+                <h3>Maquillage Pro</h3>
+                <p>Mise en beauté pour vos événements spéciaux, mariages et soirées. Un regard sublimé et un teint parfait.</p>
+            </div>
+            <div class="card">
+                <h3>Onglerie Luxe</h3>
+                <p>Manucure, pédicure et pose de vernis semi-permanent. Des mains élégantes et soignées au quotidien.</p>
+            </div>
+            <div class="card">
+                <h3>Épilation & Regard</h3>
+                <p>Restructuration des sourcils et épilation douce pour une peau lisse et un regard structuré.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="contact-info">
+            <p>📍 123 Rue de la Beauté, Alger</p>
+            <p>📞 +213 (0) 555 00 11 22</p>
+            <p>✉️ contact@inesbeauty.dz</p>
+        </div>
+        <p style="font-size: 0.8rem; opacity: 0.5;">&copy; 2026 Institut Ines Beauty. Tous droits réservés.</p>
+    </footer>
+
+</body>
+</html>
