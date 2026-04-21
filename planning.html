@@ -73,15 +73,20 @@
         }
 
         function load() {
-            db.collection("ines_beauty_bookings").orderBy("date", "asc").orderBy("time", "asc").onSnapshot(snap => {
+            // Simple query with single orderBy to avoid composite index requirement
+            db.collection("ines_beauty_bookings").get().then(snap => {
                 const list = document.getElementById('list');
                 list.innerHTML = "";
                 if(snap.empty) { list.innerHTML = "<p style='text-align:center; padding: 3rem; color: #999;'>Aucune réservation pour le moment.</p>"; return; }
 
+                // Get all docs and sort in JS by date then time
+                const all = [];
+                snap.forEach(doc => all.push(doc.data()));
+                all.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+
                 // Group by date
                 const grouped = {};
-                snap.forEach(doc => {
-                    const r = doc.data();
+                all.forEach(r => {
                     if(!grouped[r.date]) grouped[r.date] = [];
                     grouped[r.date].push(r);
                 });
@@ -107,6 +112,9 @@
                         `;
                     });
                 });
+            }).catch(err => {
+                document.getElementById('list').innerHTML = "<p style='color:red;text-align:center'>Erreur de connexion Firebase. Vérifiez votre connexion.</p>";
+                console.error(err);
             });
         }
     </script>
