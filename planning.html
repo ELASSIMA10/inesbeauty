@@ -19,8 +19,9 @@
         h1 { font-family: 'Playfair Display', serif; color: var(--sage); text-align: center; }
         .res-card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid var(--sage); box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
         .time { background: var(--sage); color: white; padding: 10px; border-radius: 4px; font-weight: 700; font-size: 1.2rem; min-width: 80px; text-align: center; }
-        .info b { font-size: 1.2rem; display: block; margin-bottom: 5px; }
-        .info span { color: #D32F2F; font-weight: 700; margin-right: 10px; }
+        .info b { font-size: 1.1rem; display: block; margin-bottom: 4px; }
+        .day-header { background: var(--sage); color: white; padding: 12px 20px; border-radius: 6px; margin: 20px 0 10px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1rem; }
+        .badge { background: white; color: var(--sage); padding: 3px 12px; border-radius: 20px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -62,23 +63,49 @@
             }
         }
 
+        function formatDate(dateStr) {
+            if (!dateStr) return dateStr;
+            const [y, m, d] = dateStr.split('-');
+            const days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+            const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+            const date = new Date(y, m - 1, d);
+            return `${days[date.getDay()]} ${d} ${months[m - 1]} ${y}`;
+        }
+
         function load() {
             db.collection("ines_beauty_bookings").orderBy("date", "asc").orderBy("time", "asc").onSnapshot(snap => {
                 const list = document.getElementById('list');
                 list.innerHTML = "";
-                if(snap.empty) list.innerHTML = "<p style='text-align:center;'>Aucune réservation.</p>";
+                if(snap.empty) { list.innerHTML = "<p style='text-align:center; padding: 3rem; color: #999;'>Aucune réservation pour le moment.</p>"; return; }
+
+                // Group by date
+                const grouped = {};
                 snap.forEach(doc => {
                     const r = doc.data();
+                    if(!grouped[r.date]) grouped[r.date] = [];
+                    grouped[r.date].push(r);
+                });
+
+                // Display by day
+                Object.keys(grouped).sort().forEach(date => {
+                    const rsvs = grouped[date];
                     list.innerHTML += `
-                        <div class="res-card">
-                            <div class="info">
-                                <b>${r.fullname}</b>
-                                <span>${r.date}</span>
-                                <small>${r.service} - 📞 ${r.phone}</small>
-                            </div>
-                            <div class="time">${r.time}</div>
+                        <div class="day-header">
+                            <span>📅 ${formatDate(date)}</span>
+                            <span class="badge">${rsvs.length} RDV</span>
                         </div>
                     `;
+                    rsvs.forEach(r => {
+                        list.innerHTML += `
+                            <div class="res-card">
+                                <div class="info">
+                                    <b>${r.fullname}</b>
+                                    <small>${r.service} — 📞 ${r.phone}</small>
+                                </div>
+                                <div class="time">${r.time}</div>
+                            </div>
+                        `;
+                    });
                 });
             });
         }
