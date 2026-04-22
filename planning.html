@@ -85,7 +85,12 @@
                 list.innerHTML = "";
                 if(!data) { list.innerHTML = "<p style='text-align:center;padding:3rem;color:#999'>Aucune réservation pour le moment.</p>"; return; }
 
-                const all = Object.values(data);
+                const all = [];
+                Object.keys(data).forEach(key => {
+                    const r = data[key];
+                    r.id = key; // On garde l'ID Firebase
+                    all.push(r);
+                });
                 all.sort((a, b) => ((a.date||'') + (a.time||'')).localeCompare((b.date||'') + (b.time||'')));
 
                 const grouped = {};
@@ -98,7 +103,7 @@
 
                     if(date === '?') return; // skip completely invalid entries
                     if(!grouped[date]) grouped[date] = [];
-                    grouped[date].push({date, name, service, phone, time});
+                    grouped[date].push({id: r.id, date, name, service, phone, time});
                 });
 
                 if(Object.keys(grouped).length === 0) {
@@ -110,11 +115,29 @@
                     const rsvs = grouped[date];
                     list.innerHTML += `<div class="day-header"><span>📅 ${formatDate(date)}</span><span class="badge">${rsvs.length} RDV</span></div>`;
                     rsvs.forEach(r => {
-                        list.innerHTML += `<div class="res-card"><div class="info"><b>${r.name}</b><small>${r.service} — 📞 ${r.phone}</small></div><div class="time">${r.time}</div></div>`;
+                        list.innerHTML += `
+                            <div class="res-card">
+                                <div class="info"><b>${r.name}</b><small>${r.service} — 📞 ${r.phone}</small></div>
+                                <div style="display:flex; align-items:center; gap: 15px;">
+                                    <div class="time">${r.time}</div>
+                                    <button onclick="deleteBooking('${r.id}')" style="background:none; border:none; cursor:pointer; font-size:1.5rem;" title="Supprimer le RDV">❌</button>
+                                </div>
+                            </div>`;
                     });
                 });
             } catch(err) {
                 list.innerHTML = "<p style='color:red;text-align:center'>Erreur: " + err.message + "</p>";
+            }
+        }
+
+        async function deleteBooking(id) {
+            if(confirm("Êtes-vous sûr de vouloir supprimer ce rendez-vous ?")) {
+                try {
+                    await fetch(`${DB_URL}/ines_beauty_bookings/${id}.json`, { method: 'DELETE' });
+                    load(); // Recharge le planning
+                } catch(e) {
+                    alert("Erreur lors de la suppression: " + e.message);
+                }
             }
         }
     </script>
